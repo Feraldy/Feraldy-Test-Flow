@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+@layer components {
+  .custom-node {
+    @apply bg-white border-2 border-gray-300 rounded-lg shadow-sm transition-all hover:shadow-md;
+  }
+  
+  .custom-node.selected {
+    @apply border-blue-500 shadow-md ring-2 ring-blue-200;
+  }
+  
+
+  
+  .edge-positive {
+    stroke: #10b981;
+    stroke-width: 2;
+  }
+  
+  .edge-negative {
+    stroke: #ef4444;
+    stroke-width: 2;
+    stroke-dasharray: 5,5;
+  }
+  
+  .palette-node {
+    @apply bg-white border border-gray-200 rounded-lg p-3 cursor-move hover:border-blue-400 hover:shadow-sm transition-all flex flex-col items-center gap-2;
+  }
+  
+  .floating-panel {
+    @apply bg-white border border-gray-200 rounded-lg shadow-lg;
+  }
+}
