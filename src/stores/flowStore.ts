@@ -4,11 +4,9 @@ import {
   addEdge, 
   applyNodeChanges, 
   applyEdgeChanges, 
-  type Connection,
-  type Node,
-  type Edge
+  type Connection
 } from 'reactflow';
-import type { CustomNode, CustomEdge, ValidationState, TestCase } from '@/types/flow';
+import type { CustomNode, CustomEdge, ValidationState, TestCase, TestStep, ValidationError } from '@/types/flow';
 import { NODE_CONFIG } from '@/constants/nodeTypes';
 
 interface FlowStore {
@@ -73,12 +71,13 @@ const initialState = {
   nodes: [
     {
       id: 'start-1',
-      type: 'start',
+      type: 'start' as const,
       position: { x: 100, y: 100 },
       data: {
         ...NODE_CONFIG.start.defaultData,
         id: 'start-1',
         type: 'start',
+        errors: [],
       },
     },
   ] as CustomNode[],
@@ -109,7 +108,7 @@ const extractPreconditions = (testCase: TestCase): string => {
   return 'Navigate to application';
 };
 
-const extractExpectedResult = (step: TestStep, testCase: TestCase): string => {
+const extractExpectedResult = (step: TestStep): string => {
   // Try to get expected result from step options
   if (step.options) {
     const options = step.options as any;
@@ -159,22 +158,23 @@ export const useFlowStore = create<FlowStore>()(
     
     onNodesChange: (changes) => {
       const { nodes } = get();
-      set({ nodes: applyNodeChanges(changes, nodes) });
+      set({ nodes: applyNodeChanges(changes, nodes) as CustomNode[] });
     },
     
     onEdgesChange: (changes) => {
       const { edges } = get();
-      set({ edges: applyEdgeChanges(changes, edges) });
+      set({ edges: applyEdgeChanges(changes, edges) as CustomEdge[] });
     },
     
     onConnect: (connection) => {
       const { edges } = get();
       const newEdge: CustomEdge = {
-        ...connection,
         id: `${connection.source}-${connection.target}`,
+        source: connection.source!,
+        target: connection.target!,
         type: 'positive',
       };
-      set({ edges: addEdge(newEdge, edges) });
+      set({ edges: addEdge(newEdge, edges) as CustomEdge[] });
       
       // Save to history after connecting nodes
       get().saveToHistory();
@@ -194,6 +194,7 @@ export const useFlowStore = create<FlowStore>()(
           ...config.defaultData,
           id: nodeId,
           type: type as any,
+          errors: [],
         },
       };
       
@@ -419,7 +420,7 @@ export const useFlowStore = create<FlowStore>()(
           priority: "medium",
           steps: testCase.steps.map((step) => ({
             action: `${step.action}${step.target ? ` on ${step.target}` : ''}${step.value ? ` with value "${step.value}"` : ''}`,
-            expected_result: extractExpectedResult(step, testCase),
+            expected_result: extractExpectedResult(step),
           })),
         })),
       };
@@ -440,9 +441,9 @@ export const useFlowStore = create<FlowStore>()(
     },
     
     validateFlow: () => {
-      const { nodes, edges } = get();
-      const errors = [];
-      const warnings = [];
+      const { nodes } = get();
+      const errors: ValidationError[] = [];
+      const warnings: ValidationError[] = [];
       
       // Check for start node
       const startNodes = nodes.filter(node => node.type === 'start');
@@ -526,7 +527,6 @@ export const useFlowStore = create<FlowStore>()(
       // Generate unique paths with proper stopping logic
       const generateUniquePaths = (startNode: CustomNode): CustomNode[][] => {
         const uniquePaths: CustomNode[][] = [];
-        const pathSignatures = new Set<string>();
         
         const explorePaths = (currentNode: CustomNode, currentPath: CustomNode[], visited: Set<string>, isNegativePath: boolean) => {
           const newPath = [...currentPath, currentNode];
@@ -602,7 +602,7 @@ export const useFlowStore = create<FlowStore>()(
                 const positiveResultNode = path.find(node => 
                   node.type === 'action' && (node.data as any).positiveExpectedResult
                 );
-                return positiveResultNode?.positiveExpectedResult || '';
+                return (positiveResultNode?.data as any)?.positiveExpectedResult || '';
               })();
           
           return {

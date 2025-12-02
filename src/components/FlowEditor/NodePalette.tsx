@@ -3,15 +3,13 @@ import { useDrag } from 'react-dnd';
 import { NODE_CONFIG } from '@/constants/nodeTypes';
 import * as Icons from 'lucide-react';
 
-const iconMap = Icons as Record<string, React.ComponentType<any>>;
-
 interface DraggableNodeProps {
   nodeType: string;
 }
 
 export const DraggableNode: React.FC<DraggableNodeProps> = ({ nodeType }) => {
   const config = NODE_CONFIG[nodeType as keyof typeof NODE_CONFIG];
-  const IconComponent = config?.icon ? iconMap[config.icon] : Icons.HelpCircle;
+  const IconComponent = config?.icon ? (Icons as any)[config.icon] || Icons.HelpCircle : Icons.HelpCircle;
   
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'NODE',
@@ -31,7 +29,7 @@ export const DraggableNode: React.FC<DraggableNodeProps> = ({ nodeType }) => {
 
   return (
     <div
-      ref={drag}
+      ref={drag as any}
       className={`palette-node opacity-90 ${isDragging ? 'opacity-50' : ''}`}
       style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
     >
@@ -48,7 +46,7 @@ export const NodePalette: React.FC = () => {
     <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-50">
       <div className="flex gap-2">
         {/* Action Nodes Only */}
-        {actionNodes.map(([type, config]) => (
+        {actionNodes.map(([type]) => (
           <DraggableNode key={type} nodeType={type} />
         ))}
       </div>

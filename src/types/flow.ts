@@ -67,6 +67,7 @@ export interface CustomEdge {
   target: string;
   type: EdgeType;
   animated?: boolean;
+  style?: React.CSSProperties;
 }
 
 // Validation
@@ -104,7 +105,7 @@ export interface TestCase {
 export interface NodeConfig {
   type: NodeType;
   label: string;
-  icon: string;
+  icon?: string;
   description: string;
   category: 'action' | 'control';
   defaultData: Partial<NodeData>;

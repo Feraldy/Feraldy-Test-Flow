@@ -12,6 +12,7 @@ export const NODE_CONFIG = {
   start: {
     type: 'start' as const,
     label: 'Start',
+    icon: 'Play',
     description: 'Beginning of test case',
     category: 'control' as const,
     defaultData: {
@@ -24,6 +25,7 @@ export const NODE_CONFIG = {
   action: {
     type: 'action' as const,
     label: 'Action',
+    icon: 'MousePointer',
     description: 'Perform an action on an element',
     category: 'action' as const,
     defaultData: {

@@ -1,13 +1,11 @@
 import React, { useCallback, useRef, useEffect } from 'react';
 import { 
   ReactFlow, 
-  addEdge, 
   Background, 
   Controls, 
   MiniMap,
   type Connection,
-  type Edge,
-  type Node
+  type Edge
 } from 'reactflow';
 import { useDrop } from 'react-dnd';
 import { useFlowStore } from '@/stores/flowStore';
@@ -43,7 +41,7 @@ const FlowCanvas: React.FC = () => {
       const offset = monitor.getClientOffset();
       if (!offset || !reactFlowWrapper.current || !reactFlowInstance) return;
 
-      const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+
       
       // Convert screen coordinates to ReactFlow coordinates
       const position = reactFlowInstance.screenToFlowPosition({
@@ -138,7 +136,7 @@ const FlowCanvas: React.FC = () => {
   return (
     <div className="w-full h-screen relative" ref={reactFlowWrapper}>
       <div 
-        ref={drop} 
+        ref={drop as any} 
         className={`w-full h-full ${isOver ? 'bg-blue-50' : ''}`}
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
       >

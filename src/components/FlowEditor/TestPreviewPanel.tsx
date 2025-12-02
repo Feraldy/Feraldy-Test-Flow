@@ -2,7 +2,7 @@ import React from 'react';
 import { useFlowStore } from '@/stores/flowStore';
 
 export const TestPreviewPanel: React.FC = () => {
-  const { testCases, selectedNodeId } = useFlowStore();
+  const { testCases } = useFlowStore();
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (
@@ -48,7 +48,7 @@ export const TestPreviewPanel: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                {testCases.map((testCase, index) => (
+                {testCases.map((testCase) => (
                   <div key={testCase.id} className="border border-gray-200 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="font-medium text-gray-900">{testCase.name}</h3>
